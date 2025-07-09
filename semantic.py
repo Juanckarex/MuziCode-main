@@ -84,8 +84,11 @@ class SemanticAnalyzer:
     def _mix_items(self, items, beat_ms):
         """
         Mezcla los items (patrones y melodías) y devuelve un AudioSegment.
+        La base de mezcla tendrá la duración máxima entre todos los sonidos a mezclar.
         """
-        final = AudioSegment.silent(duration=beat_ms * 4)
+        sounds = []
+        max_duration = 0
+        # Genera todos los sonidos y calcula la duración máxima
         for name in items:
             sound = None
             if name in self.patterns:
@@ -93,7 +96,13 @@ class SemanticAnalyzer:
             elif name in self.melodies:
                 sound = self.create_melody_sound(name, beat_ms)
             if sound:
-                final = final.overlay(sound)
+                sounds.append(sound)
+                if len(sound) > max_duration:
+                    max_duration = len(sound)
+        # Crea la base de mezcla con la duración máxima
+        final = AudioSegment.silent(duration=max_duration)
+        for sound in sounds:
+            final = final.overlay(sound)
         return final
 
     def create_pattern_sound(self, name, beat_ms):
