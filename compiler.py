@@ -23,14 +23,5 @@ class Compiler:
 
 
 if __name__ == "__main__":
-    # Ejemplo de uso: puedes reemplazar este código por lectura de archivo o entrada de usuario
-    code = """
-    tempo 80
-    pattern kick = [1,0,1,0,1,0,1]
-    pattern snare = [1,0,1,0]
-    pattern hat = [1,0,1,1]
-    melody main = [E4, G4, C4, C4, G4, E4, C4]
-    repeat 2
-    save salida.wav (kick, snare, hat, main)
-    """
-    Compiler().compile(code)
+    from view import show_gui
+    show_gui()
