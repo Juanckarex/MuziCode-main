@@ -13,7 +13,7 @@ class SemanticAnalyzer:
     - Soporta repetición automática con el comando repeat N
     """
 
-    def __init__(self, commands):
+    def __init__(self, commands, log_callback=None):
         self.commands = commands  # List of parsed commands (dicts)
         self.tempo = 120  # Default tempo
         self.patterns = {}  # Stores rhythm patterns
@@ -22,6 +22,13 @@ class SemanticAnalyzer:
         self.notes_dir = "notes"      # Directory for note samples
         self.current_playback = None  # For stopping playback if needed
         self.repeat_count = 1  # Número de repeticiones de la mezcla
+        self.log_callback = log_callback
+
+    def log(self, msg):
+        if self.log_callback:
+            self.log_callback(str(msg))
+        else:
+            print(msg)
 
     def analyze(self):
         """
@@ -30,15 +37,21 @@ class SemanticAnalyzer:
         for cmd in self.commands:
             if cmd["type"] == "REPEAT":
                 self.repeat_count = cmd["value"]
+                self.log(f"Repeticiones configuradas: {self.repeat_count}")
             elif cmd["type"] == "TEMPO":
                 self.tempo = cmd["value"]
+                self.log(f"Tempo configurado: {self.tempo} BPM")
             elif cmd["type"] == "PATTERN":
                 self.patterns[cmd["name"]] = cmd["sequence"]
+                self.log(f"Patrón '{cmd['name']}' cargado: {cmd['sequence']}")
             elif cmd["type"] == "MELODY":
                 self.melodies[cmd["name"]] = cmd["notes"]
+                self.log(f"Melodía '{cmd['name']}' cargada: {cmd['notes']}")
             elif cmd["type"] == "MIX":
+                self.log(f"Mezclando: {cmd['items']}")
                 self.mix_and_play(cmd["items"])
             elif cmd["type"] == "SAVE":
+                self.log(f"Guardando mezcla en: {cmd['filename']}")
                 self.mix_and_save(cmd["items"], cmd["filename"])
 
     def load_audio_file(self, file_path):
@@ -47,11 +60,11 @@ class SemanticAnalyzer:
         """
         try:
             if not os.path.exists(file_path):
-                print(f"Archivo no encontrado: {file_path}")
+                self.log(f"Archivo no encontrado: {file_path}")
                 return None
             return AudioSegment.from_wav(file_path)
         except Exception as e:
-            print(f"Error cargando {file_path}: {str(e)}")
+            self.log(f"Error cargando {file_path}: {str(e)}")
             return None
 
     def mix_and_play(self, items, loop=False):
@@ -59,7 +72,7 @@ class SemanticAnalyzer:
         Mixes and plays the given patterns/melodies by overlaying their audio, repeated as needed.
         """
         if not items:
-            print("Error: No hay items para mezclar")
+            self.log("Error: No hay items para mezclar")
             return
         beat_ms = 60000 // self.tempo  # Duration of a beat in ms
         final = self._mix_items(items, beat_ms)
@@ -79,7 +92,7 @@ class SemanticAnalyzer:
         # Repetir la mezcla según repeat_count
         final = final * self.repeat_count
         final.export(filename, format="wav")
-        print(f"Mezcla guardada como {filename}")
+        self.log(f"Mezcla guardada como {filename}")
 
     def _mix_items(self, items, beat_ms):
         """
@@ -122,10 +135,8 @@ class SemanticAnalyzer:
         return sound
 
     def create_melody_sound(self, name, beat_ms):
-    
         #Creates an AudioSegment for a melody by sequencing note samples.
         #Recorta cada nota si es más larga que beat_ms.
-        
         sound = AudioSegment.silent(duration=0)
         for note in self.melodies[name]:
             note_audio = self.load_audio_file(f"{self.notes_dir}/{note}.wav")

@@ -13,13 +13,16 @@ class Compiler:
     - Semantic analysis (execution)
     """
 
+    def __init__(self, log_callback=None):
+        self.log_callback = log_callback
+
     def compile(self, code: str):
         # 1. Lexical analysis: convierte el código en tokens
         tokens = LexicalAnalyzer.lex(code)
         # 2. Sintactic analysis: valida y estructura los comandos
         commands = SintacticAnalyzer(tokens).parse()
         # 3. Semantic analysis: ejecuta la lógica musical
-        SemanticAnalyzer(commands).analyze()
+        SemanticAnalyzer(commands, log_callback=self.log_callback).analyze()
 
 
 if __name__ == "__main__":
