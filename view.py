@@ -70,13 +70,16 @@ def show_gui():
             n_frames = wf.getnframes()
             audio = wf.readframes(n_frames)
             audio = np.frombuffer(audio, dtype=np.int16)
-        fig, ax = plt.subplots(figsize=(6, 2))
-        ax.plot(audio, color='blue')
-        ax.set_title("Forma de onda")
-        ax.set_xlabel("Muestras")
-        ax.set_ylabel("Amplitud")
+        fig, ax = plt.subplots(figsize=(6, 2), facecolor="#181818")
+        ax.set_facecolor("#181818")
+        ax.plot(audio, color='#2ecc40')  # verde para la onda
+        ax.set_title("Forma de onda", color="#fff")
+        ax.set_xlabel("Muestras", color="#fff")
+        ax.set_ylabel("Amplitud", color="#fff")
         ax.set_xticks([])
         ax.set_yticks([])
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#fff')
         fig.tight_layout()
         canvas = FigureCanvasTkAgg(fig, master=parent_frame)
         canvas.draw()
@@ -85,26 +88,43 @@ def show_gui():
 
     root = tk.Tk()
     root.title("Music DSL Compiler")
+    root.configure(bg="#181818")
 
-    code_input = scrolledtext.ScrolledText(root, width=80, height=20)
+    # Estilos generales
+    style_args = {"bg": "#181818", "fg": "#fff", "insertbackground": "#fff", "highlightbackground": "#fff", "highlightcolor": "#fff"}
+    code_input = scrolledtext.ScrolledText(root, width=80, height=12, **style_args, borderwidth=2, relief="solid")
     code_input.pack(padx=10, pady=(10, 0))
+    # No insertar texto por defecto para evitar errores de compilación
 
-    bottom_frame = tk.Frame(root)
+    console_output = scrolledtext.ScrolledText(root, height=6, state="disabled", bg="#181818", fg="#fff", insertbackground="#fff", borderwidth=2, relief="solid", highlightbackground="#fff", highlightcolor="#fff")
+    console_output.pack(fill=tk.BOTH, padx=10, pady=(0, 10), expand=False)
+    console_output.configure(font=("Consolas", 10))
+    console_output.configure(state="normal")
+    console_output.insert(tk.END, "Console\n")
+    console_output.configure(state="disabled")
+
+    bottom_frame = tk.Frame(root, bg="#181818")
     bottom_frame.pack(fill=tk.X, padx=10, pady=5)
 
-    test_button = tk.Button(bottom_frame, text="Prueba", command=insertar_texto_prueba)
-    test_button.pack(side=tk.LEFT)
+    test_button = tk.Button(bottom_frame, text="Prueba", command=insertar_texto_prueba, bg="#181818", fg="#fff", activebackground="#222", activeforeground="#fff", borderwidth=1, relief="solid", highlightbackground="#fff")
+    test_button.pack(side=tk.LEFT, padx=5)
 
-    compile_button = tk.Button(bottom_frame, text="Compilar y Guardar", command=run_compile)
-    compile_button.pack(side=tk.RIGHT)
+    compile_button = tk.Button(bottom_frame, text="Compilar y Guardar", command=run_compile, bg="#181818", fg="#fff", activebackground="#222", activeforeground="#fff", borderwidth=1, relief="solid", highlightbackground="#fff")
+    compile_button.pack(side=tk.RIGHT, padx=5)
 
-    play_button = tk.Button(bottom_frame, text="Play", command=run_play)
+    play_button = tk.Button(bottom_frame, text="▶", command=run_play, bg="#2ecc40", fg="#fff", font=("Arial", 14, "bold"), activebackground="#27ae60", activeforeground="#fff", borderwidth=1, relief="solid", highlightbackground="#fff")
     play_button.pack(side=tk.RIGHT, padx=5)
 
-    console_output = scrolledtext.ScrolledText(root, height=10, state="disabled", bg="#111", fg="#0f0")
-    console_output.pack(fill=tk.BOTH, padx=10, pady=(0, 10), expand=False)
-
-    waveform_frame = tk.Frame(root, height=120)
+    waveform_frame = tk.Frame(root, height=120, bg="#181818", highlightbackground="#fff", highlightcolor="#fff", highlightthickness=1, bd=0)
     waveform_frame.pack(fill=tk.BOTH, padx=10, pady=(0, 10), expand=False)
+
+    # Etiqueta de Wavelength
+    label_wave = tk.Label(root, text="Wavelengh", bg="#181818", fg="#fff", font=("Arial", 10))
+    label_wave.pack(pady=(0, 5))
+
+    # Cambia los bordes de los cuadros principales
+    code_input.config(borderwidth=2, relief="solid", highlightthickness=2, highlightbackground="#fff")
+    console_output.config(borderwidth=2, relief="solid", highlightthickness=2, highlightbackground="#fff")
+    waveform_frame.config(borderwidth=2, relief="solid", highlightthickness=2, highlightbackground="#fff")
 
     root.mainloop()
