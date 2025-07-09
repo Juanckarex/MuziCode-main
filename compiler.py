@@ -25,11 +25,12 @@ class Compiler:
 if __name__ == "__main__":
     # Ejemplo de uso: puedes reemplazar este código por lectura de archivo o entrada de usuario
     code = """
-    tempo 120
-    pattern kick = [1,0,0,0]
-    pattern snare = [0,0,1,0]
-    pattern hat = [1,1,1,1]
-    melody main = [C4, E4, G4, C5]
-    mix(kick, snare, hat, main)
+    tempo 190
+    pattern kick = [1,0,1,0,1,0,1]
+    pattern snare = [1,0,1,0]
+    pattern hat = [1,0,1,1]
+    melody main = [C4, G4, C4, C4, G4, E4, C4]
+    repeat 4
+    save salida.wav (kick, snare, hat, main)
     """
     Compiler().compile(code)

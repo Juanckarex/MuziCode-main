@@ -30,7 +30,9 @@ class LexicalAnalyzer:
             if not line:
                 continue
             # Reconoce los comandos del DSL
-            if re.match(r"^tempo\s+\d+", line, re.IGNORECASE):
+            if re.match(r"^repeat\s+\d+", line, re.IGNORECASE):
+                tokens.append(Token("REPEAT", line))
+            elif re.match(r"^tempo\s+\d+", line, re.IGNORECASE):
                 tokens.append(Token("TEMPO", line))
             elif re.match(r"^pattern\s+\w+\s*=\s*\[.*\]", line, re.IGNORECASE):
                 tokens.append(Token("PATTERN", line))

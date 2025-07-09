@@ -15,7 +15,11 @@ class SintacticAnalyzer:
     def parse(self):
         commands = []
         for token in self.tokens:
-            if token.type_ == "TEMPO":
+            if token.type_ == "REPEAT":
+                m = re.match(r"repeat\s+(\d+)", token.value, re.IGNORECASE)
+                if m:
+                    commands.append({"type": "REPEAT", "value": int(m.group(1))})
+            elif token.type_ == "TEMPO":
                 m = re.match(r"tempo\s+(\d+)", token.value, re.IGNORECASE)
                 if m:
                     commands.append({"type": "TEMPO", "value": int(m.group(1))})
