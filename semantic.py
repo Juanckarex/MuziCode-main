@@ -122,15 +122,22 @@ class SemanticAnalyzer:
         return sound
 
     def create_melody_sound(self, name, beat_ms):
-        """
-        Creates an AudioSegment for a melody by sequencing note samples.
-        """
+    
+        #Creates an AudioSegment for a melody by sequencing note samples.
+        #Recorta cada nota si es más larga que beat_ms.
+        
         sound = AudioSegment.silent(duration=0)
         for note in self.melodies[name]:
             note_audio = self.load_audio_file(f"{self.notes_dir}/{note}.wav")
             if note_audio:
-                sound += note_audio + AudioSegment.silent(duration=beat_ms - len(note_audio))
+                # Recortar si es más largo que un beat
+                if len(note_audio) > beat_ms:
+                    note_audio = note_audio[:beat_ms]
+                # Añadir silencio solo si la nota es más corta que el beat
+                silence_duration = max(0, beat_ms - len(note_audio))
+                sound += note_audio + AudioSegment.silent(duration=silence_duration)
             else:
+                # Si no se encuentra el audio, añadir solo silencio
                 sound += AudioSegment.silent(duration=beat_ms)
         return sound
 
